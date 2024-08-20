@@ -21,6 +21,14 @@ COPY . .
 # Buat file .env dari .env.example jika belum ada
 RUN if [ ! -f .env ]; then cp .env.example .env; fi
 
+ENV LARAVEL_DATABASE_TYPE=mysql
+ENV LARAVEL_DATABASE_HOST=dbdonordarah
+ENV LARAVEL_DATABASE_PORT=3306
+ENV LARAVEL_DATABASE_NAME=dbdonordarah
+ENV LARAVEL_DATABASE_USER=root
+ENV LARAVEL_DATABASE_PASSWORD=12345678
+
+
 # Perbarui dependensi untuk memastikan kompatibilitas dengan PHP versi image
 RUN composer update
 
