@@ -64,6 +64,7 @@ pipeline {
                         sh '''
                         ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} <<EOF
 echo "${DOCKER_PASSWORD}" | sudo docker login -u ${DOCKER_USERNAME} --password-stdin
+echo "MARIADB_DATABASE=${DB_NAME}"
 sudo docker stop ${CONTAINER_NAME} || true
 sudo docker rm ${CONTAINER_NAME} || true
 sudo docker stop ${PHPMYADMIN_CONTAINER_NAME} || true
