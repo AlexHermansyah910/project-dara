@@ -1,5 +1,5 @@
-# Use PHP 7.4 with Apache as the base image
-FROM php:8.4-apache
+# Gunakan PHP 8.2 dengan Apache sebagai base image
+FROM php:8.2-apache
 
 # Set environment variables
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
@@ -35,6 +35,9 @@ COPY . /var/www/html
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Perbarui dependensi untuk memastikan kompatibilitas dengan PHP versi image
+RUN composer update --no-dev --optimize-autoloader
 
 # Install project dependencies
 RUN composer install --no-dev --optimize-autoloader
