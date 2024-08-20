@@ -77,9 +77,9 @@ sudo docker pull ${IMAGE_NAME}
 sudo docker run -d -p ${DB_PORT_CONTAINER} --name ${DB_CONTAINER_NAME} --restart unless-stopped -e MARIADB_ROOT_PASSWORD=12345678 -e MYSQL_DATABASE=${DB_NAME} -e MARIADB_DATABASE=${DB_NAME} --network ${DB_NETWORK_NAME} -v ${DB_VOLUME_NAME}:/var/lib/mysql docker.io/mariadb
 sudo docker run -d -p ${PHPMYADMIN_PORT_HOST}:${PHPMYADMIN_PORT_CONTAINER} -e PMA_HOST=${DB_CONTAINER_NAME} --name ${PHPMYADMIN_CONTAINER_NAME} --restart unless-stopped --network ${DB_NETWORK_NAME} docker.io/phpmyadmin
 sudo docker run -d --name ${CONTAINER_NAME} --network ${DB_NETWORK_NAME} -p ${APP_PORT_HOST}:${APP_PORT_CONTAINER} --restart unless-stopped ${IMAGE_NAME}
-sudo docker exec -it donordarah_container php artisan migrate
-sudo docker exec -it donordarah_container php artisan db:seed RoleSeeder
-sudo docker exec -it donordarah_container php artisan db:seed UserSeeder
+sudo docker exec  donordarah_container php artisan migrate
+sudo docker exec  donordarah_container php artisan db:seed RoleSeeder
+sudo docker exec  donordarah_container php artisan db:seed UserSeeder
 EOF
                         '''
                     }
