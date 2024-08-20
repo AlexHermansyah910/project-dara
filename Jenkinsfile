@@ -62,7 +62,7 @@ pipeline {
                     echo "EC2 Host: ${EC2_HOST}"
                     withCredentials([file(credentialsId: "${SSH_KEY_ID}", variable: 'SSH_KEY')]) {
                         sh '''
-                        ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} <<EOF
+                        ssh -T -i ${SSH_KEY} -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} <<EOF
 echo "${DOCKER_PASSWORD}" | sudo docker login -u ${DOCKER_USERNAME} --password-stdin
 echo "MARIADB_DATABASE=${DB_NAME}"
 sudo docker stop ${CONTAINER_NAME} || true
