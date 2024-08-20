@@ -20,7 +20,7 @@ pipeline {
         PHPMYADMIN_PORT_HOST = '8080'
         PHPMYADMIN_PORT_CONTAINER = '80'
         APP_PORT_HOST = '80'
-        APP_PORT_CONTAINER = '8000'
+        APP_PORT_CONTAINER = '80'
     }
 
     options {
