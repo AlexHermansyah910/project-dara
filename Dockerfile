@@ -1,48 +1,58 @@
-# Gunakan image bitnami/laravel dengan PHP versi yang sesuai
-FROM bitnami/laravel:latest
+# Use PHP 7.4 with Apache as the base image
+FROM php:8.4-apache
 
-# Install dependencies tambahan yang diperlukan
-USER root
+# Set environment variables
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+ENV COMPOSER_ALLOW_SUPERUSER 1
+
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
     unzip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    libzip-dev
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+
+# Configure Apache
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN a2enmod rewrite
 
 # Set working directory
-WORKDIR /app
+WORKDIR /var/www/html
 
-# Salin file aplikasi Laravel ke dalam container
-COPY . .
+# Copy existing application directory contents
+COPY . /var/www/html
 
-# Buat file .env dari .env.example jika belum ada
-RUN if [ ! -f .env ]; then cp .env.example .env; fi
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-ENV LARAVEL_DATABASE_TYPE=mysql
-ENV LARAVEL_DATABASE_HOST=dbdonordarah
-ENV LARAVEL_DATABASE_PORT=3306
-ENV LARAVEL_DATABASE_NAME=dbdonordarah
-ENV LARAVEL_DATABASE_USER=root
-ENV LARAVEL_DATABASE_PASSWORD=12345678
-
-
-# Perbarui dependensi untuk memastikan kompatibilitas dengan PHP versi image
-RUN composer update
-
-# Install dependencies Laravel
+# Install project dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Generate key Laravel
+# Copy .env.example to .env if .env does not exist
+RUN php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+# Generate application key
 RUN php artisan key:generate
 
 # Set permissions
-RUN chown -R bitnami:bitnami /app \
-    && chmod -R 755 /app/storage
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
 
-# Expose port
-EXPOSE 8000
-# Jalankan server Laravel
-CMD ["php", "artisan", "serve", "--host", "0.0.0.0", "--port", "8000"]
+# Expose port 80
+EXPOSE 80
+
+# Start Apache
+CMD ["apache2-foreground"]
